@@ -11,7 +11,7 @@ app.use(express.json());
 
 // Pool kết nối PostgreSQL (Render sẽ cung cấp DATABASE_URL trong Environment Variables)
 const pool = new Pool({
-    connectionString: "postgresql://postgres:Kimngan2903@@db.agiisnnhyyggtkgubodh.supabase.co:5432/postgres",
+    connectionString: "postgresql://web_user_db_user:lpQH2GJfok6LXAXBONWk8MZUAWF1M3EZ@dpg-d2gc2pbuibrs73e78fq0-a.oregon-postgres.render.com/web_user_db",
     ssl: { rejectUnauthorized: false }
 });
 
@@ -41,9 +41,10 @@ app.post('/api/register', async (req, res) => {
 
         return res.json({ success: true, message: 'Đăng ký thành công!' });
     } catch (err) {
-        console.error(err);
-        res.json({ success: false, message: 'Lỗi server!' });
+        console.error("❌ Lỗi chi tiết:", err);
+        res.status(500).json({ success: false, message: 'Lỗi server!', error: err.message });
     }
+
 });
 
 // API đăng nhập
