@@ -51,12 +51,11 @@ app.post('/api/register', async (req, res) => {
             return res.status(409).json({ success: false, message: 'Email hoặc số điện thoại đã tồn tại!' });
         }
 
-        // Băm mật khẩu trước khi lưu vào cơ sở dữ liệu
-        const hashedPassword = await bcrypt.hash(password, 10); // 10 là saltRounds (độ phức tạp của thuật toán băm)
+        const hashedPassword = await bcrypt.hash(password, 10); 
 
         await pool.query(
             'INSERT INTO users (username, email, phone, password) VALUES ($1, $2, $3, $4)',
-            [username, email, phone, hashedPassword] // Lưu mật khẩu đã băm
+            [username, email, phone, hashedPassword] 
         );
 
         return res.status(201).json({ success: true, message: 'Đăng ký thành công! Vui lòng đăng nhập.' });
@@ -75,9 +74,30 @@ app.post('/api/login', async (req, res) => {
     }
 
     try {
+        // --- Kiểm tra tài khoản Admin cứng (cho mục đích demo/kiểm thử) ---
+        // RỦI RO BẢO MẬT CỰC KỲ CAO: KHÔNG BAO GIỜ DÙNG TRONG PRODUCTION!
+        const HARDCODED_ADMIN_IDENTIFIER = 'admin';
+        const HARDCODED_ADMIN_PASSWORD_PLAINTEXT = 'admin123'; // Mật khẩu plaintext cho admin
+
+        if (identifier === HARDCODED_ADMIN_IDENTIFIER) {
+            // So sánh mật khẩu plaintext trực tiếp
+            if (password === HARDCODED_ADMIN_PASSWORD_PLAINTEXT) {
+                console.log('Admin login successful!');
+                return res.status(200).json({ 
+                    success: true, 
+                    message: 'Đăng nhập Admin thành công!', 
+                    user: { id: 'admin_id_frontend', username: 'Administrator', role: 'admin' } // Thông tin cơ bản cho frontend
+                });
+            } else {
+                return res.status(401).json({ success: false, message: 'Thông tin đăng nhập Admin không đúng!' });
+            }
+        }
+        // --- Kết thúc kiểm tra Admin cứng ---
+
+        // Nếu không phải admin cứng, tiếp tục kiểm tra trong cơ sở dữ liệu
         const result = await pool.query(
             `SELECT * FROM users 
-            WHERE email=$1 OR phone=$1 OR username=$1`, // Chỉ tìm người dùng theo identifier
+            WHERE email=$1 OR phone=$1 OR username=$1`, 
             [identifier]
         );
 
@@ -86,11 +106,11 @@ app.post('/api/login', async (req, res) => {
         }
 
         const user = result.rows[0];
-        // So sánh mật khẩu người dùng nhập (đã được băm) với mật khẩu đã băm trong DB
+        // So sánh mật khẩu người dùng nhập với mật khẩu đã băm trong DB
         const isMatch = await bcrypt.compare(password, user.password);
 
         if (isMatch) {
-            res.status(200).json({ success: true, message: 'Đăng nhập thành công!', user: { id: user.id, username: user.username, email: user.email, phone: user.phone } }); // Tránh trả về mật khẩu
+            res.status(200).json({ success: true, message: 'Đăng nhập thành công!', user: { id: user.id, username: user.username, email: user.email, phone: user.phone } }); 
         } else {
             res.status(401).json({ success: false, message: 'Thông tin đăng nhập không đúng!' });
         }
@@ -101,7 +121,7 @@ app.post('/api/login', async (req, res) => {
 });
 
 // API lấy danh sách tất cả người dùng
-app.get('/api/admin', async (req, res) => {
+app.get('/api/users', async (req, res) => { 
     try {
         const result = await pool.query('SELECT username, email, phone FROM users');
         res.status(200).json(result.rows);
