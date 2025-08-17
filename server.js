@@ -11,7 +11,7 @@ app.use(express.json());
 
 // Pool kết nối PostgreSQL (Render sẽ cung cấp DATABASE_URL trong Environment Variables)
 const pool = new Pool({
-    connectionString: "postgresql://postgres:Kimngan2903@db.agiisnnhyyggtkgubodh.supabase.co:5432/postgres",
+    connectionString: "postgresql://postgres:Kimngan2903@@db.agiisnnhyyggtkgubodh.supabase.co:5432/postgres",
     ssl: { rejectUnauthorized: false }
 });
 
