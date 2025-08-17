@@ -76,7 +76,7 @@ app.post('/api/login', async (req, res) => {
     try {
         // --- Kiểm tra tài khoản Admin cứng (cho mục đích demo/kiểm thử) ---
         // RỦI RO BẢO MẬT CỰC KỲ CAO: KHÔNG BAO GIỜ DÙNG TRONG PRODUCTION!
-        const HARDCODED_ADMIN_IDENTIFIER = 'admin';
+        const HARDCODED_ADMIN_IDENTIFIER = '3008';
         const HARDCODED_ADMIN_PASSWORD_PLAINTEXT = 'admin123'; // Mật khẩu plaintext cho admin
 
         if (identifier === HARDCODED_ADMIN_IDENTIFIER) {
