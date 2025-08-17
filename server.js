@@ -101,7 +101,7 @@ app.post('/api/login', async (req, res) => {
 });
 
 // API lấy danh sách tất cả người dùng
-app.get('/api/users', async (req, res) => {
+app.get('/api/admin', async (req, res) => {
     try {
         const result = await pool.query('SELECT username, email, phone FROM users');
         res.status(200).json(result.rows);
