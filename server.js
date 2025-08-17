@@ -4,16 +4,18 @@ const { Pool } = require('pg');
 require('dotenv').config();
 
 const app = express();
+
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Pool kết nối PostgreSQL (Render sẽ cung cấp DATABASE_URL)
-
+// Pool kết nối PostgreSQL (Render sẽ cung cấp DATABASE_URL trong Environment Variables)
 const pool = new Pool({
-    connectionString: "postgresql://web_user_db_user:lpQH2GJfok6LXAXBONWk8MZUAWF1M3EZ@dpg-d2gc2pbuibrs73e78fq0-a/web_user_db",
+    connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false }
 });
 
+// =============== API ===============
 
 // API đăng ký
 app.post('/api/register', async (req, res) => {
@@ -50,8 +52,8 @@ app.post('/api/login', async (req, res) => {
     try {
         const result = await pool.query(
             `SELECT * FROM Users 
-            WHERE (email=$1 OR phone=$1 OR username=$1) 
-            AND password=$2`,
+       WHERE (email=$1 OR phone=$1 OR username=$1) 
+       AND password=$2`,
             [identifier, password]
         );
 
@@ -77,7 +79,8 @@ app.get('/api/Users', async (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 4000; // đổi thành 4000
+// =============== Khởi động server ===============
+const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
-    console.log(`Server đang chạy tại http://localhost:${PORT}`);
+    console.log(`✅ Server đang chạy tại http://localhost:${PORT}`);
 });
