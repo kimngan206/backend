@@ -11,9 +11,10 @@ app.use(express.json());
 
 // Pool kết nối PostgreSQL (Render sẽ cung cấp DATABASE_URL trong Environment Variables)
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: "postgresql://postgres:Kimngan2903@db.agiisnnhyyggtkgubodh.supabase.co:5432/postgres",
     ssl: { rejectUnauthorized: false }
 });
+
 
 // =============== API ===============
 
@@ -24,7 +25,7 @@ app.post('/api/register', async (req, res) => {
     try {
         // Kiểm tra trùng email/sđt
         const check = await pool.query(
-            'SELECT * FROM Users WHERE email = $1 OR phone = $2',
+            'SELECT * FROM users WHERE email = $1 OR phone = $2',
             [email, phone]
         );
 
@@ -34,7 +35,7 @@ app.post('/api/register', async (req, res) => {
 
         // Insert user
         await pool.query(
-            'INSERT INTO Users (username, email, phone, password) VALUES ($1, $2, $3, $4)',
+            'INSERT INTO users (username, email, phone, password) VALUES ($1, $2, $3, $4)',
             [username, email, phone, password]
         );
 
@@ -51,7 +52,7 @@ app.post('/api/login', async (req, res) => {
 
     try {
         const result = await pool.query(
-            `SELECT * FROM Users 
+            `SELECT * FROM users 
        WHERE (email=$1 OR phone=$1 OR username=$1) 
        AND password=$2`,
             [identifier, password]
@@ -69,9 +70,9 @@ app.post('/api/login', async (req, res) => {
 });
 
 // API lấy danh sách người dùng
-app.get('/api/Users', async (req, res) => {
+app.get('/api/users', async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM Users');
+        const result = await pool.query('SELECT * FROM users');
         res.json(result.rows);
     } catch (err) {
         console.error(err);
