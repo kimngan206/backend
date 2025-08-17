@@ -9,7 +9,7 @@ const app = express();
 // Thay thế 'https://kimngan206.github.io' bằng tên miền chính xác của trang web của bạn trên GitHub Pages.
 // Đảm bảo không có dấu '/' ở cuối.
 const corsOptions = {
-    origin: 'https://kimngan206.github.io',
+    origin: 'https://kimngan206.github.io', 
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Chỉ cho phép các phương thức cần thiết
     allowedHeaders: ['Content-Type', 'Authorization'], // Thêm Authorization nếu bạn dùng token sau này
 };
