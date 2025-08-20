@@ -7,8 +7,13 @@ require('dotenv').config();
 const app = express();
 
 // --- Cấu hình CORS ---
+// Điều chỉnh origin để đảm bảo nó khớp chính xác với frontend của bạn.
+// Nếu bạn đang thử nghiệm cục bộ, hãy thêm 'http://localhost:5500' hoặc cổng tương ứng.
 const corsOptions = {
-    origin: 'https://kimngan206.github.io', // Đảm bảo URL này chính xác với frontend của bạn
+    origin: [
+        'https://kimngan206.github.io', // URL triển khai frontend của bạn
+        'http://localhost:5500'       // Nếu bạn đang chạy frontend cục bộ để kiểm thử
+    ],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
 };
