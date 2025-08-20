@@ -132,7 +132,7 @@ app.delete('/api/users/:id', async (req, res) => {
     }
 });
 
-// API xử lý form liên hệ
+// API xử lý form liên hệ (giữ nguyên để nhận dữ liệu từ form liên hệ)
 app.post('/api/contacts', async (req, res) => {
     const { full_name, email, phone_number, request_type, car_type, budget, detailed_message } = req.body;
 
@@ -152,6 +152,34 @@ app.post('/api/contacts', async (req, res) => {
         res.status(500).json({ success: false, message: 'Lỗi server khi gửi liên hệ!' });
     }
 });
+
+// API: Lấy danh sách tất cả liên hệ (cho trang quản lý liên hệ)
+app.get('/api/contacts', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT id, full_name, email, phone_number, request_type, car_type, budget, detailed_message, created_at FROM contacts ORDER BY created_at DESC');
+        res.status(200).json(result.rows);
+    } catch (err) {
+        console.error('Lỗi khi lấy danh sách liên hệ:', err.message);
+        res.status(500).json({ success: false, message: 'Lỗi server khi lấy danh sách liên hệ!' });
+    }
+});
+
+// API: Xóa liên hệ theo ID (cho trang quản lý liên hệ)
+app.delete('/api/contacts/:id', async (req, res) => {
+    const contactId = req.params.id;
+    try {
+        const result = await pool.query('DELETE FROM contacts WHERE id = $1 RETURNING id', [contactId]);
+        if (result.rowCount > 0) {
+            res.status(200).json({ success: true, message: `Liên hệ với ID ${contactId} đã được xóa thành công.` });
+        } else {
+            res.status(404).json({ success: false, message: `Không tìm thấy liên hệ với ID ${contactId}.` });
+        }
+    } catch (err) {
+        console.error('Lỗi khi xóa liên hệ:', err.message);
+        res.status(500).json({ success: false, message: 'Lỗi server khi xóa liên hệ!' });
+    }
+});
+
 
 // ============ API Endpoints cho Sản phẩm ============
 
