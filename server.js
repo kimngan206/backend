@@ -1,14 +1,14 @@
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
-const bcrypt = require('bcryptjs'); // Import thư viện bcryptjs
-require('dotenv').config(); // Đảm bảo dotenv được tải để sử dụng biến môi trường
+const bcrypt = require('bcryptjs');
+require('dotenv').config();
 
 const app = express();
 
 // --- Cấu hình CORS ---
 const corsOptions = {
-    origin: 'https://kimngan206.github.io',
+    origin: 'https://kimngan206.github.io', // Đảm bảo URL này chính xác với frontend của bạn
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
 };
@@ -52,11 +52,12 @@ app.post('/api/register', async (req, res) => {
         }
 
         // Băm mật khẩu trước khi lưu vào cơ sở dữ liệu
-        const hashedPassword = await bcrypt.hash(password, 10); // 10 là saltRounds (độ phức tạp của thuật toán băm)
+        const hashedPassword = await bcrypt.hash(password, 10);
 
+        // Đã sửa lỗi: 'INSERT INTO INTO' thành 'INSERT INTO'
         await pool.query(
-            'INSERT INTO INTO users (username, email, phone, password) VALUES ($1, $2, $3, $4)',
-            [username, email, phone, hashedPassword] // Lưu mật khẩu đã băm
+            'INSERT INTO users (username, email, phone, password) VALUES ($1, $2, $3, $4)',
+            [username, email, phone, hashedPassword]
         );
 
         return res.status(201).json({ success: true, message: 'Đăng ký thành công! Vui lòng đăng nhập.' });
@@ -77,7 +78,7 @@ app.post('/api/login', async (req, res) => {
     try {
         const result = await pool.query(
             `SELECT * FROM users
-            WHERE email=$1 OR phone=$1 OR username=$1`, // Chỉ tìm người dùng theo identifier
+            WHERE email=$1 OR phone=$1 OR username=$1`,
             [identifier]
         );
 
@@ -86,11 +87,10 @@ app.post('/api/login', async (req, res) => {
         }
 
         const user = result.rows[0];
-        // So sánh mật khẩu người dùng nhập (đã được băm) với mật khẩu đã băm trong DB
         const isMatch = await bcrypt.compare(password, user.password);
 
         if (isMatch) {
-            res.status(200).json({ success: true, message: 'Đăng nhập thành công!', user: { id: user.id, username: user.username, email: user.email, phone: user.phone } }); // Tránh trả về mật khẩu
+            res.status(200).json({ success: true, message: 'Đăng nhập thành công!', user: { id: user.id, username: user.username, email: user.email, phone: user.phone } });
         } else {
             res.status(401).json({ success: false, message: 'Thông tin đăng nhập không đúng!' });
         }
@@ -101,7 +101,7 @@ app.post('/api/login', async (req, res) => {
 });
 
 // API lấy danh sách tất cả người dùng (cho trang admin)
-app.get('/api/admin', async (req, res) => { // Giữ nguyên endpoint /api/admin
+app.get('/api/admin', async (req, res) => {
     try {
         // Lấy thêm cột 'id' để frontend có thể sử dụng cho chức năng xóa
         const result = await pool.query('SELECT id, username, email, phone FROM users ORDER BY id ASC');
@@ -128,8 +128,7 @@ app.delete('/api/users/:id', async (req, res) => {
     }
 });
 
-
-// API xử lý form liên hệ (bổ sung từ các cuộc trò chuyện trước)
+// API xử lý form liên hệ
 app.post('/api/contacts', async (req, res) => {
     const { full_name, email, phone_number, request_type, car_type, budget, detailed_message } = req.body;
 
@@ -149,7 +148,6 @@ app.post('/api/contacts', async (req, res) => {
         res.status(500).json({ success: false, message: 'Lỗi server khi gửi liên hệ!' });
     }
 });
-
 
 // =============== Khởi động server ===============
 const PORT = process.env.PORT || 4000;
