@@ -194,7 +194,7 @@ app.get('/api/products/:id', async (req, res) => {
 });
 
 // API: Thêm sản phẩm mới
-app.post('/api/products', async (req, res) => {
+app.post('/api/manage_product', async (req, res) => {
     const { name, price, description, image } = req.body; // image tương ứng với image_url
 
     if (!name || !price || !image) {
@@ -221,7 +221,7 @@ app.post('/api/products', async (req, res) => {
 });
 
 // API: Cập nhật sản phẩm theo ID
-app.put('/api/products/:id', async (req, res) => {
+app.put('/api/manage_product/:id', async (req, res) => {
     const productId = req.params.id;
     const { name, price, description, image } = req.body; // image tương ứng với image_url
 
@@ -254,7 +254,7 @@ app.put('/api/products/:id', async (req, res) => {
 });
 
 // API: Xóa sản phẩm theo ID
-app.delete('/api/products/:id', async (req, res) => {
+app.delete('/api/manage_product/:id', async (req, res) => {
     const productId = req.params.id;
     try {
         const result = await pool.query('DELETE FROM products WHERE id = $1 RETURNING id', [productId]);
